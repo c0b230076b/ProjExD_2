@@ -8,14 +8,19 @@ WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-def check_bound(rct):
-    width = False
-    height = False
-    if rct.left <= 0 or rct.right >= 1100:
-        width = True
-    if rct.top <= 0 or rct.bottom >= 650:
-        height = True
-    return (width, height)
+def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
+    """
+    引数で与えられたrectが画面内か画面外か判定
+    引数：こうかとんrectか爆弾rect
+    戻り値：タプル（横方向判定結果,　縦方向判定結果）画面内ならTrue, 画面外ならFalse
+    """
+    x = True
+    y = True
+    if rct.left < 0 or rct.right > WIDTH:
+        x = False
+    if rct.top < 0 or rct.bottom > HEIGHT:
+        y = False
+    return (x, y)
 
 
 def main():
@@ -25,7 +30,7 @@ def main():
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     bb_img = pg.Surface((20,20))  #爆弾surface
     pg.draw.circle(bb_img, (255,0,0), (10,10), 10)  #半径10の赤色の円を中心座標(10,10)に描画
-    bb_img.set_colorkey((0,0,0))  #黒色を表示しない
+    bb_img.set_colorkey((0,0,0))  #黒色を透過させる
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
     bb_rct = bb_img.get_rect()  #爆弾rectの抽出
@@ -58,25 +63,19 @@ def main():
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
         kk_rct.move_ip(sum_mv)
-        # a = check_bound(kk_rct)
-        # if a[0]:
-        #     sum_mv[0] *= -1
-        #     kk_rct.move_ip(sum_mv)
-        # if a[1]:
-        #     sum_mv[1] *= -1
-        #     kk_rct.move_ip(sum_mv)
-
-
-        # for i, bl in enumerate (check_bound(kk_rct)):
-        #     if bl:
-        #         sum_mv[i] *= -1
-        #     else: 
-        #         kk_rct.move_ip(sum_mv)
+        if check_bound(kk_rct) != (True, True):
+            kk_rct.move_ip([-sum_mv[0], -sum_mv[1]])
                 
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)
+        bb_rct.move_ip(vx, vy)  #爆弾動く
+        x, y = check_bound(bb_rct)
+        if not x:
+            vx *= -1
+        if not y:
+            vy *= -1
+        
+            
         screen.blit(bb_img, bb_rct)
-        check_bound(bb_rct)
 
         pg.display.update()
         tmr += 1
