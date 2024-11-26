@@ -18,8 +18,9 @@ def main():
     bb_img.set_colorkey((0,0,0))
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
-    # bb_rct = bb_img.get_rect()
-    # bb_rct.center = random.randrange(WIDTH), random.randrange(HEIGHT)
+    bb_rct = bb_img.get_rect()
+    bb_rct.center = random.randrange(WIDTH), random.randrange(HEIGHT)
+    vx, vy = +5, +5
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -28,9 +29,9 @@ def main():
                 return
         screen.blit(bg_img, [0, 0]) 
         # screen.blit(bb_img, [random.randrange(WIDTH), random.randrange(HEIGHT)])
-        # screen.blit(bb_img, bb_rct)
+        screen.blit(bb_img, bb_rct)
 
-        # DELTA = {pg.K_UP:(0,-5), pg.K_DOWN:(0,+5), pg.K_LEFT:(-5,0), pg.K_RIGHT:(+5,0)}
+        DELTA = {pg.K_UP:(0,-5), pg.K_DOWN:(0,+5), pg.K_LEFT:(-5,0), pg.K_RIGHT:(+5,0)}
 
 
         key_lst = pg.key.get_pressed()
@@ -45,7 +46,7 @@ def main():
             sum_mv[0] += 5
         kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
-        # bb_rct.move_ip(vx, vy)
+        bb_rct.move_ip(vx, vy)
 
         pg.display.update()
         tmr += 1
