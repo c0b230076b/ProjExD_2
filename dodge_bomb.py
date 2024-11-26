@@ -11,9 +11,9 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 def check_bound(rct):
     width = False
     height = False
-    if rct.left == 0 or rct.right == 1100:
+    if rct.left <= 0 or rct.right >= 1100:
         width = True
-    if rct.top == 0 or rct.bottom == 650:
+    if rct.top <= 0 or rct.bottom >= 650:
         height = True
     return (width, height)
 
@@ -23,14 +23,15 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
-    bb_img = pg.Surface((20,20))
-    pg.draw.circle(bb_img, (255,0,0), (10,10), 10)
-    bb_img.set_colorkey((0,0,0))
+    bb_img = pg.Surface((20,20))  #爆弾surface
+    pg.draw.circle(bb_img, (255,0,0), (10,10), 10)  #半径10の赤色の円を中心座標(10,10)に描画
+    bb_img.set_colorkey((0,0,0))  #黒色を表示しない
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
-    bb_rct = bb_img.get_rect()
-    bb_rct.center = random.randrange(WIDTH), random.randrange(HEIGHT)
-    vx, vy = +5, +5
+    bb_rct = bb_img.get_rect()  #爆弾rectの抽出
+    bb_rct.centerx = random.randint(0, WIDTH)
+    bb_rct.centery = random.randint(0, HEIGHT)
+    vx, vy = +5, +5  #爆弾速度ベクトル
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -39,13 +40,11 @@ def main():
                 return
         screen.blit(bg_img, [0, 0]) 
         # screen.blit(bb_img, [random.randrange(WIDTH), random.randrange(HEIGHT)])
-        # screen.blit(bb_img, bb_rct)
 
         DELTA = {pg.K_UP:(0,-5), pg.K_DOWN:(0,+5), pg.K_LEFT:(-5,0), pg.K_RIGHT:(+5,0), }
-
-
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
+        #辞書を作成したので、for文で書ける。
         # if key_lst[pg.K_UP]:
         #     sum_mv[1] -= 5
         # if key_lst[pg.K_DOWN]:
@@ -59,6 +58,14 @@ def main():
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
         kk_rct.move_ip(sum_mv)
+        # a = check_bound(kk_rct)
+        # if a[0]:
+        #     sum_mv[0] *= -1
+        #     kk_rct.move_ip(sum_mv)
+        # if a[1]:
+        #     sum_mv[1] *= -1
+        #     kk_rct.move_ip(sum_mv)
+
 
         # for i, bl in enumerate (check_bound(kk_rct)):
         #     if bl:
@@ -67,8 +74,9 @@ def main():
         #         kk_rct.move_ip(sum_mv)
                 
         screen.blit(kk_img, kk_rct)
-        # bb_rct.move_ip(vx, vy)
-        # check_bound(bb_rct)
+        bb_rct.move_ip(vx, vy)
+        screen.blit(bb_img, bb_rct)
+        check_bound(bb_rct)
 
         pg.display.update()
         tmr += 1
