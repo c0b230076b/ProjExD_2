@@ -8,6 +8,16 @@ WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+def check_bound(rct):
+    width = False
+    height = False
+    if rct.left == 0 or rct.right == 1100:
+        width = True
+    if rct.top == 0 or rct.bottom == 650:
+        height = True
+    return (width, height)
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -29,24 +39,36 @@ def main():
                 return
         screen.blit(bg_img, [0, 0]) 
         # screen.blit(bb_img, [random.randrange(WIDTH), random.randrange(HEIGHT)])
-        screen.blit(bb_img, bb_rct)
+        # screen.blit(bb_img, bb_rct)
 
-        DELTA = {pg.K_UP:(0,-5), pg.K_DOWN:(0,+5), pg.K_LEFT:(-5,0), pg.K_RIGHT:(+5,0)}
+        DELTA = {pg.K_UP:(0,-5), pg.K_DOWN:(0,+5), pg.K_LEFT:(-5,0), pg.K_RIGHT:(+5,0), }
 
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-        if key_lst[pg.K_UP]:
-            sum_mv[1] -= 5
-        if key_lst[pg.K_DOWN]:
-            sum_mv[1] += 5
-        if key_lst[pg.K_LEFT]:
-            sum_mv[0] -= 5
-        if key_lst[pg.K_RIGHT]:
-            sum_mv[0] += 5
+        # if key_lst[pg.K_UP]:
+        #     sum_mv[1] -= 5
+        # if key_lst[pg.K_DOWN]:
+        #     sum_mv[1] += 5
+        # if key_lst[pg.K_LEFT]:
+        #     sum_mv[0] -= 5
+        # if key_lst[pg.K_RIGHT]:
+        #     sum_mv[0] += 5
+        for key, tpl in DELTA.items():
+            if key_lst[key] == True:
+                sum_mv[0] += tpl[0]
+                sum_mv[1] += tpl[1]
         kk_rct.move_ip(sum_mv)
+
+        # for i, bl in enumerate (check_bound(kk_rct)):
+        #     if bl:
+        #         sum_mv[i] *= -1
+        #     else: 
+        #         kk_rct.move_ip(sum_mv)
+                
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)
+        # bb_rct.move_ip(vx, vy)
+        # check_bound(bb_rct)
 
         pg.display.update()
         tmr += 1
