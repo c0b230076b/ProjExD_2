@@ -9,6 +9,20 @@ WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
+    """
+    移動量の合計タプルに対応する向きの画像Surfaceを返す
+    """
+    pass
+
+
+def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]) -> tuple[float, float]:
+    """
+    orgから見て、dstがどこにあるかを計算し、方向ベクトルをタプルで返す
+    """
+    pass
+
+
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
     引数で与えられたrectが画面内か画面外か判定
@@ -107,12 +121,12 @@ def main():
             kk_rct.move_ip([-sum_mv[0], -sum_mv[1]])
 
         screen.blit(kk_img, kk_rct)
-        bb_imgs, bb_accs = init_bb_imgs()
         # print(bb_imgs)
         # bb_accs = init_bb_imgs()[1]  #加速度だけ変更 
+        bb_imgs, bb_accs = init_bb_imgs()
         avx = vx*bb_accs[min(tmr//500, 9)]
         avy = vy*bb_accs[min(tmr//500, 9)]
-        bb_img = bb_imgs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//10, 9)]
         # bb_rct = bb_img.get_rect()
         # print(type(bb_img))
         bb_rct.move_ip(avx, avy)  #爆弾動く
