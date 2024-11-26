@@ -35,13 +35,30 @@ def game_over(screen: pg.Surface) -> None:
     go_kk_img = pg.image.load("fig/8.png")  #泣いているこうかとん読みこみ
     fonto = pg.font.Font(None, 100)  #文字surface生成
     go_txt = fonto.render("Game Over", True, (255, 255, 255))  #文字をGame Over,色を白に設定
-    go_txt_rct = go_txt.get_rect()
-    go_txt_rct.center = (WIDTH/2, HEIGHT/2)
-    screen.blit(black, [0,0])
-    screen.blit(go_kk_img, [WIDTH/2+200, HEIGHT/2-30])
-    screen.blit(go_kk_img, [WIDTH/2-240, HEIGHT/2-30])
-    screen.blit(go_txt, go_txt_rct)
-    pg.display.update()
+    go_txt_rct = go_txt.get_rect()  #Game Overテキストのrectを抽出
+    go_txt_rct.center = (WIDTH/2, HEIGHT/2)  #中心をWIDTH/2,HEIGHT/2に設定
+    screen.blit(black, [0,0])  #ブラックアウトを描画
+    screen.blit(go_kk_img, [WIDTH/2+200, HEIGHT/2-30])  #泣いているこうかとんを描画(右)
+    screen.blit(go_kk_img, [WIDTH/2-240, HEIGHT/2-30])  #泣いているこうかとんを描画(左)
+    screen.blit(go_txt, go_txt_rct)  #Game Overを表示
+    pg.display.update()  #画面の更新
+
+
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    時間とともに爆弾を拡大、加速させる関数
+    """
+    bb_accs = [a for a in range(1,11)]  #爆弾の加速度のリスト
+    bb_imgs = []  #拡大爆弾のリスト
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0,0,0))
+        bb_imgs.append(bb_img)
+        # print(bb_img)
+        
+
+    return (bb_imgs, bb_accs)
 
 
 def main():
@@ -51,6 +68,7 @@ def main():
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     bb_img = pg.Surface((20,20))  #爆弾surface
     pg.draw.circle(bb_img, (255,0,0), (10,10), 10)  #半径10の赤色の円を中心座標(10,10)に描画
+    # print(type(bb_img))
     bb_img.set_colorkey((0,0,0))  #黒色を透過させる
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
@@ -78,15 +96,6 @@ def main():
         DELTA = {pg.K_UP:(0,-5), pg.K_DOWN:(0,+5), pg.K_LEFT:(-5,0), pg.K_RIGHT:(+5,0), }
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-        #辞書を作成したので、for文で書ける。
-        # if key_lst[pg.K_UP]:
-        #     sum_mv[1] -= 5
-        # if key_lst[pg.K_DOWN]:
-        #     sum_mv[1] += 5
-        # if key_lst[pg.K_LEFT]:
-        #     sum_mv[0] -= 5
-        # if key_lst[pg.K_RIGHT]:
-        #     sum_mv[0] += 5
 
         for key, tpl in DELTA.items():
             if key_lst[key] == True:
@@ -98,11 +107,19 @@ def main():
             kk_rct.move_ip([-sum_mv[0], -sum_mv[1]])
 
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)  #爆弾動く
+        bb_imgs, bb_accs = init_bb_imgs()
+        # print(bb_imgs)
+        # bb_accs = init_bb_imgs()[1]  #加速度だけ変更 
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        # bb_rct = bb_img.get_rect()
+        # print(type(bb_img))
+        bb_rct.move_ip(avx, avy)  #爆弾動く
         x, y = check_bound(bb_rct)
-        if not x:
+        if not x:  #横にはみ出てる
             vx *= -1
-        if not y:
+        if not y:  #縦にはみ出てる
             vy *= -1
         screen.blit(bb_img, bb_rct)
         pg.display.update()
