@@ -12,7 +12,7 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
     引数で与えられたrectが画面内か画面外か判定
     引数：こうかとんrectか爆弾rect
-    戻り値：タプル（横方向判定結果,　縦方向判定結果）画面内ならTrue, 画面外ならFalse
+    戻り値：真理値タプル（横方向判定結果,　縦方向判定結果）画面内ならTrue, 画面外ならFalse
     """
     x = True
     y = True
@@ -43,6 +43,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+        if kk_rct.colliderect(bb_rct):
+            print("Game Over")
+            return
         screen.blit(bg_img, [0, 0]) 
         # screen.blit(bb_img, [random.randrange(WIDTH), random.randrange(HEIGHT)])
 
